@@ -21,12 +21,12 @@ function Home() {
   // })
 
 
-  useEffect(() => {
-    if (sender) {
-      socket.emit("register", sender)
-    }
+  // useEffect(() => {
+  //   if (sender) {
+  //     socket.emit("register", sender)
+  //   }
 
-  }, [sender])
+  // }, [sender])
 
 
   useEffect(() => {

@@ -4,19 +4,7 @@ import axios from "axios"
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { socket } from './Home';
 import { HiDotsVertical } from "react-icons/hi";
-import DeletePopUp from '../components/DeletePopUp';
-import { messageDataContext } from '../context/MessageContext';
 
-
-export const fetchDeletedMessages = async (firstUser, secondUser) => {
-  try {
-
-    console.log("response : ", response)
-
-  } catch (error) {
-    console.log(error)
-  }
-}
 
 function ChatPage() {
 
@@ -25,7 +13,7 @@ function ChatPage() {
   const { userId: receiver, sender } = useParams();
   const [message, setMessage] = useState("");
   const [conversation, setConversation] = useState([]);
-  const [receiverS, setReceiver] = useState()
+  const [receiverS, setReceiverSocket] = useState()
   const [isDeletePopUpOpen, setIsDeletePopUpOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState({});
   const [filteredMessages, setFilteredMessages] = useState([]);
@@ -51,6 +39,14 @@ function ChatPage() {
     }
 }
 
+//
+
+const handleDeleteMessageFromBothUser = async () => {
+
+  const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
+
+}
+
 // HANDLE DELETE POPUP
 
   const handleMessageClick = (e, msg) => {
@@ -65,9 +61,18 @@ function ChatPage() {
 
   useEffect(() => {
     if (sender) {
-      socket.emit("register", sender);
+      if (socket.connected) {
+        // console.log("Registering with socket:", sender);
+        socket.emit("register", sender);
+      } else {
+        socket.on("connect", () => {
+          // console.log("Registering with socket:", sender);
+          socket.emit("register", sender);
+        });
+      }
     }
-  }, [sender]);
+  }, []);
+  
 
   // FETCH RECEIVER
 
@@ -81,7 +86,9 @@ function ChatPage() {
 
       if (data.success === true) {
         setUser(data.user)
-        setReceiver(data.user?.socketId)
+        setReceiverSocket(data.user?.socketId)
+        console.log("Receiver socket Id : " , data.user?.socketId);
+        
       }
 
     };
@@ -89,6 +96,12 @@ function ChatPage() {
     fetchUser()
 
   }, [receiver, receiverS])
+
+  useEffect(() => {
+    socket.on("updation" , (receiverSocket) => {
+      setReceiverSocket(receiverSocket)
+    })
+  })
 
 //  FETCH MESSAGES FROM THE BACKEND....
 
@@ -104,6 +117,26 @@ function ChatPage() {
     fetchMessage()
   }, [receiver, sender])
 
+// FETCH DELETED MESSAGES...
+
+useEffect(() => {
+
+  const fetchDeletedMessage = async () => {
+    const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}` , {withCredentials : true});
+    setDeletedMessages(() => [...response.data.messages]);
+  }
+  fetchDeletedMessage();
+
+} , [updateDeleteMessageFlag]);
+
+//  UPDATE FILTERED MESSAGE....
+
+useEffect(() => {
+  const deletedMessageSet = new Set(deletedMessages.map((msg) => {if (msg.deletedBy === sender) return msg.messageId}))
+  setFilteredMessages(() => conversation.filter((msg) => !deletedMessageSet.has(msg._id)));
+  
+}, [deletedMessages , conversation])
+
 // SEND MESSAGE
 
   const sendMessage = async (e) => {
@@ -112,48 +145,28 @@ function ChatPage() {
     // socket.connect()
     socket.emit("message", { receiverS, message, receiver, sender })
 
-    setConversation((prevMessages) => [...prevMessages, { sender, receiver, message }]);
+    setFilteredMessages((prevMessages) => [...prevMessages, { sender : sender, receiver : receiver, message }]);
 
     setMessage("")
   }
 
 // RECEIVE MESSAGE...
 
-  useEffect(() => {
+useEffect(() => {
+  const handleReceiveMessage = (message) => {
+    console.log("message : " ,  message)
+    setFilteredMessages((prevMessages) => [...prevMessages, {
+      sender: receiver, receiver: sender, message
+    }]);
+  };
 
-    socket.on("receivedMessage", (message) => {
-      setConversation((prevMessages) => [...prevMessages, { sender: receiver, receiver: sender, message }])
+  socket.on("receivedMessage", handleReceiveMessage);
 
-    })
+  return () => {
+    socket.off("receivedMessage", handleReceiveMessage);
+  };
+}, []); // 👈 empty dependency array
 
-    return () => {
-      socket.off("receivedMessage", () => {
-        setConversation((prevMessages) => [...prevMessages, { sender: receiver, receiver: sender, message }])
-      }); // Cleanup listener
-    };
-
-
-  }, [receiver, sender])
-
-// FETCH DELETED MESSAGES...
-
-  useEffect(() => {
-
-    const fetchDeletedMessage = async () => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}` , {withCredentials : true});
-      setDeletedMessages((prev) => [...prev , ...response.data.messages]);
-    }
-    fetchDeletedMessage();
-
-  } , [updateDeleteMessageFlag]);
-
-//  UPDATE FILTERED MESSAGE....
-
-  useEffect(() => {
-    const deletedMessageSet = new Set(deletedMessages.map((msg) => {if (msg.deletedBy === sender) return msg.messageId}))
-    setFilteredMessages(() => conversation.filter((msg) => !deletedMessageSet.has(msg._id)));
-    
-  }, [deletedMessages , conversation])
 
   return (
 

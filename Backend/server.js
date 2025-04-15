@@ -7,7 +7,6 @@ import { Server } from "socket.io";
 import { userModel } from "./models/user.model.js";
 import { conversationModel } from "./models/conversation.model.js";
 import { createConversation } from "./utils/saveConversation.js";
-import mongoose from "mongoose";
 
 const server = http.createServer(app)
 const port = process.env.PORT || 5000
@@ -19,9 +18,7 @@ const io = new Server(server , {
     }
 })
 
-let user = {
-    id : ""
-}
+let user = {}
 
 io.on("connection" , (socket) => {
     console.log('A user connected' , socket.id);
@@ -31,9 +28,10 @@ io.on("connection" , (socket) => {
         if (!userId) return; 
 
         try {
-            await userModel.findByIdAndUpdate(userId , {socketId : socket.id , status : "online"} , {new : true});
+            await userModel.findByIdAndUpdate(userId , {socketId : socket.id} , {new : true});
             console.log("socketId Updated");
-            user[socket.id] = userId
+            io.emit("updation" , socket.id);
+            // user[socket.id] = userId
             // console.log('userId : ' , user[socket.id]);
             
         } catch (error) {
@@ -43,28 +41,28 @@ io.on("connection" , (socket) => {
 
 
     socket.on("message" , async({receiverS , message , receiver , sender}) => {
-        console.log(`message : ${message} , to receiver : ${receiver} ,  send by ${sender}`)
+        console.log(`message : ${message} , to receiver : ${receiver} , rs : ${receiverS}  ,  send by ${sender}`)
         const conversationCreated = await createConversation(message , receiver , sender);
         io.to(receiverS).emit("receivedMessage" , message)
     })
 
-    socket.on("disconnect", async () => {
-        const userId = user[socket.id]; 
+    // socket.on("disconnect", async () => {
+    //     const userId = user[socket.id]; 
 
-        if (!userId) {
-            console.log("No userId found for socket:", socket.id);
-            return;
-        }
+    //     if (!userId) {
+    //         console.log("No userId found for socket:", socket.id);
+    //         return;
+    //     }
 
-        try {
-            await userModel.findByIdAndUpdate(userId, { status: "offline" }, { new: true });
-            console.log(`User ${userId} is now offline.`);
-        } catch (error) {
-            console.log("Error updating user status:", error.message);
-        } finally {
-            delete user[socket.id]; 
-        }
-    })
+    //     try {
+    //         await userModel.findByIdAndUpdate(userId, { status: "offline"}, { new: true });
+    //         console.log(`User ${userId} is now offline.`);
+    //     } catch (error) {
+    //         console.log("Error updating user status:", error.message);
+    //     } finally {
+    //         delete user[socket.id]; 
+    //     }
+    // })
 
     
 

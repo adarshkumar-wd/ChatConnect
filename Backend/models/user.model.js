@@ -57,7 +57,7 @@ userSchema.methods.checkPassword = async function (password) {
 
 userSchema.methods.generateTokens = function () {
 
-    return jwt.sign({_id : this._id} , process.env.TOKEN_SECRET , {expiresIn : process.env.TOKEN_EXPIRY})
+    return jwt.sign({_id : this._id} , process.env.TOKEN_SECRET);
 
 }
 export const userModel = mongoose.model("User" , userSchema)
