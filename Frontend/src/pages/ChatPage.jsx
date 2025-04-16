@@ -97,9 +97,13 @@ const handleDeleteMessageFromBothUser = async () => {
 
   }, [receiver, receiverS])
 
+  // Handle Receiver Socket Updation
+
   useEffect(() => {
-    socket.on("updation" , (receiverSocket) => {
-      setReceiverSocket(receiverSocket)
+    socket.on("updation" , (receiverSocket , receiverId) => {
+      if (receiver === receiverId) {
+        setReceiverSocket(receiverSocket)
+      }
     })
   })
 
@@ -154,7 +158,7 @@ useEffect(() => {
 
 useEffect(() => {
   const handleReceiveMessage = (message) => {
-    console.log("message : " ,  message)
+    // console.log("message : " ,  message)
     setFilteredMessages((prevMessages) => [...prevMessages, {
       sender: receiver, receiver: sender, message
     }]);
@@ -165,7 +169,7 @@ useEffect(() => {
   return () => {
     socket.off("receivedMessage", handleReceiveMessage);
   };
-}, []); // 👈 empty dependency array
+}, []); 
 
 
   return (

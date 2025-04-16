@@ -29,8 +29,8 @@ io.on("connection" , (socket) => {
 
         try {
             await userModel.findByIdAndUpdate(userId , {socketId : socket.id} , {new : true});
-            console.log("socketId Updated");
-            io.emit("updation" , socket.id);
+            // console.log("socketId Updated");
+            io.emit("updation" , socket.id , userId);
             // user[socket.id] = userId
             // console.log('userId : ' , user[socket.id]);
             
@@ -41,7 +41,7 @@ io.on("connection" , (socket) => {
 
 
     socket.on("message" , async({receiverS , message , receiver , sender}) => {
-        console.log(`message : ${message} , to receiver : ${receiver} , rs : ${receiverS}  ,  send by ${sender}`)
+        // console.log(`message : ${message} , to receiver : ${receiver} , rs : ${receiverS}  ,  send by ${sender}`)
         const conversationCreated = await createConversation(message , receiver , sender);
         io.to(receiverS).emit("receivedMessage" , message)
     })

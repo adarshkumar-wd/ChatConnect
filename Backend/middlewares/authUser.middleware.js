@@ -7,7 +7,7 @@ export const authUser = async (req , _ , next) => {
     // console.log("token : " , token)
 
     if (!token) {
-        throw new Error("Provide valid token...");
+        console.log("token " , token);
     }
 
     const decodeToken = jwt.verify(token , process.env.TOKEN_SECRET);
