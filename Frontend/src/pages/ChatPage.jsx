@@ -19,23 +19,31 @@ function ChatPage() {
   const [filteredMessages, setFilteredMessages] = useState([]);
   const [deletedMessages, setDeletedMessages] = useState([]);
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
+  const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
 
   // SAVE DELETED MESSAGE TO THE BACKEND...
 
   const handleDeleteFromSender = async () => {
 
     try {
-      console.log(selectedMessage._id, selectedMessage.sender, selectedMessage.receiver);
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/sender/${selectedMessage.sender}/receiver/${selectedMessage.receiver}/deletedBy/${sender}`, { withCredentials: true });
-      console.log("response : ", response.data.deletedMessage);
+      if (selectedMessage._id && selectedMessage.sender && selectedMessage.receiver) {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/sender/${selectedMessage.sender}/receiver/${selectedMessage.receiver}/deletedBy/${sender}`, { withCredentials: true });
+        // console.log("response : ", response.data.deletedMessage);
+  
+        if (!response.data.deletedMessage.success) {
+          console.log(response.data.message || "Select valid message");
+        }
+  
+        setUpdateDeleteMessageFlag(!updateDeleteMessageFlag);
+        setIsDeletePopUpOpen(false)
+      } else {
+        console.log("data not found properly..");
+        console.log(selectedMessage._id, selectedMessage.sender, selectedMessage.receiver);
+        setIsDeletePopUpOpen(false)
 
-      if (!response.data.deletedMessage.success) {
-        console.log(response.data.message || "Select valid message");
       }
 
-      setUpdateDeleteMessageFlag(!updateDeleteMessageFlag);
-      setIsDeletePopUpOpen(false)
     } catch (error) {
       setIsDeletePopUpOpen(false);
       console.log("Delete message from sender error : " , error);
@@ -46,9 +54,29 @@ function ChatPage() {
 
   const handleDeleteMessageFromBothUser = async () => {
 
-    const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
+    try {
+      if (selectedMessage._id) {
+        const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
+        console.log("response : " , response);
+        setIsDeletePopUpOpen(false)
+      } else {
+        console.log("Data not found properly..")
+        setIsDeletePopUpOpen(false)
+      }
+    } catch (error) {
+      console.log(error);
+      setIsDeletePopUpOpen(false)
+
+    }
 
   }
+
+  useEffect(() => {
+    socket.on("messageDeleted" , () => {
+      setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
+    })
+  })
+
 
   // HANDLE DELETE POPUP
 
@@ -130,7 +158,7 @@ function ChatPage() {
       }
     }
     fetchMessage()
-  }, [receiver, sender])
+  }, [receiver, sender , deleteMessageFromDbFlag])
 
   // FETCH DELETED MESSAGES...
 
@@ -215,7 +243,7 @@ function ChatPage() {
 
             <div className={`${isDeletePopUpOpen ? "" : "hidden"} bg-white absolute w-[60%] top-[50%] z-20 -translate-y-1/2 left-[50%] -translate-x-1/2 px-4 py-3 border-1 border-black text-red-400 text-2xl font-semibold rounded-lg`}>
               <p onClick={handleDeleteFromSender} className='cursor-pointer'>Delete from me</p>
-              <p className='cursor-pointer'>Delete from both</p>
+              <p onClick={handleDeleteMessageFromBothUser} className='cursor-pointer'>Delete from both</p>
             </div>
 
             {socket.connected ?

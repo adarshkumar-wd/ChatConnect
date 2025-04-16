@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { deletedMessageModdel } from "../models/deletedMessages.model.js";
 import { conversationModel } from "../models/conversation.model.js";
+import { io } from "../server.js";
 
 export const createmessage = async (req , res) => {
 
@@ -64,6 +65,10 @@ export const deleteMessageFromDatabase = async (req , res) => {
         if (!deleteMessage) {
             return res.status(400).json({success : false , message : "Message not found in the Database"});
         }
+
+        const deleteMessagefromDeletedMessageModel = await deletedMessageModdel.findOneAndDelete({messageId : messageId});
+
+        io.emit("messageDeleted");
 
         return res.status(200).json({success : true , message : "Message Deleted Succesfully"});
 
