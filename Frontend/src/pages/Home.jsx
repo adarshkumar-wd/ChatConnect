@@ -19,12 +19,16 @@ function Home() {
 
     const fetchUsers = async () => {
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
-
-      const data = response.data
-
-      if (data.success === true) {
-        setUsers(data.users)
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
+  
+        const data = response.data
+  
+        if (data.success === true) {
+          setUsers(data.users)
+        }
+      } catch (error) {
+        console.log("fetchUsers error : " , error)
       }
 
     }

@@ -37,7 +37,8 @@ function ChatPage() {
       setUpdateDeleteMessageFlag(!updateDeleteMessageFlag);
       setIsDeletePopUpOpen(false)
     } catch (error) {
-      console.log(error)
+      setIsDeletePopUpOpen(false);
+      console.log("Delete message from sender error : " , error);
     }
   }
 
@@ -82,15 +83,19 @@ function ChatPage() {
 
     const fetchUser = async () => {
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-user/${receiver}`, { withCredentials: true });
-      const data = response.data;
-
-
-      if (data.success === true) {
-        setUser(data.user)
-        setReceiverSocket(data.user?.socketId)
-        console.log("Receiver socket Id : ", data.user?.socketId);
-
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-user/${receiver}`, { withCredentials: true });
+        const data = response.data;
+  
+  
+        if (data.success === true) {
+          setUser(data.user)
+          setReceiverSocket(data.user?.socketId)
+          // console.log("Receiver socket Id : ", data.user?.socketId);
+  
+        }
+      } catch (error) {
+        console.log("fetching receiver error : " , error);
       }
 
     };
@@ -113,11 +118,15 @@ function ChatPage() {
 
   useEffect(() => {
     const fetchMessage = async () => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/messages/get-msg/${receiver}/${sender}`, { withCredentials: true });
-      const data = response.data
-
-      if (data.success === true) {
-        setConversation(data.messages)
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}/messages/get-msg/${receiver}/${sender}`, { withCredentials: true });
+        const data = response.data
+  
+        if (data.success === true) {
+          setConversation(data.messages)
+        }
+      } catch (error) {
+        console.log("Fetching message from backend error : " , error);
       }
     }
     fetchMessage()
@@ -128,8 +137,12 @@ function ChatPage() {
   useEffect(() => {
 
     const fetchDeletedMessage = async () => {
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}`, { withCredentials: true });
-      setDeletedMessages(() => [...response.data.messages]);
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}`, { withCredentials: true });
+        setDeletedMessages(() => [...response.data.messages]);
+      } catch (error) {
+        console.log("Deleted message fetching error : " , error);
+      }
     }
     fetchDeletedMessage();
 
@@ -178,11 +191,11 @@ function ChatPage() {
 
     <>
 
-      <main className='w-screen h-screen flex justify-center bg-gray-400'>
+      <main className='w-screen h-screen flex justify-center bg-pink-100'>
 
-        <section className='w-full h-full flex flex-col justify-between items-center bg-gray-400 xs:w-[90%] xs2:w-[70%] sm:w-[60%] md:w-[50%] custom1:w-[40%] lg:w-[35%] custom2:w-[32%] xl:w-[29%]'>
+        <section className='w-full h-full  border-2 border-pink-300 flex flex-col justify-between items-center bg-pink-200 xs:w-[90%] xs2:w-[70%] sm:w-[60%] md:w-[50%] custom1:w-[40%] lg:w-[35%] custom2:w-[32%] xl:w-[29%]'>
 
-          <nav className='w-full flex gap-4 py-3 items-center px-3 justify-between border-b-[1px] border-b-black bg-white'>
+          <nav className='w-full flex gap-4 py-3 items-center px-3 justify-between border-b-[1px] border-b-black bg-red-100'>
 
             <div className='flex items-center gap-5'>
               <Link to={"/"} className='font-medium text-2xl mr-2'><IoMdArrowBack /></Link>
@@ -198,7 +211,7 @@ function ChatPage() {
 
           </nav>
 
-          <div className='relative w-full h-full bg-gray-200 py-3 px-3 flex flex-col gap-16 overflow-y-scroll' >
+          <div className='relative w-full h-full bg-red-50 py-3 px-3 flex flex-col gap-16 overflow-y-scroll scrollbar-none' >
 
             <div className={`${isDeletePopUpOpen ? "" : "hidden"} bg-white absolute w-[60%] top-[50%] z-20 -translate-y-1/2 left-[50%] -translate-x-1/2 px-4 py-3 border-1 border-black text-red-400 text-2xl font-semibold rounded-lg`}>
               <p onClick={handleDeleteFromSender} className='cursor-pointer'>Delete from me</p>
@@ -206,14 +219,14 @@ function ChatPage() {
             </div>
 
             {socket.connected ?
-              <div className='w-full h-full flex flex-col overflow-y-scroll' style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+              <div className='w-full h-full flex flex-col overflow-y-scroll scrollbar-none'>
                 {filteredMessages.map((msg, index) => (
                   <div
                     onContextMenu={(e) => handleMessageClick(e, msg)}
                     key={index}
                     className={`w-full flex ${msg.sender === sender ? 'justify-end' : 'justify-start'} px-2 mb-4`}
                   >
-                    <div className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-200'} px-4 py-2 rounded-xl bg-white text-black max-w-[70%] break-words shadow`}>
+                    <div className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-100'} cursor-pointer px-4 py-2 rounded-xl text-black max-w-[70%] break-words shadow`}>
                       {msg.message}
                     </div>
                   </div>
