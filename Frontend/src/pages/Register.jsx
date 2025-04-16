@@ -1,4 +1,4 @@
-import React, { useState , useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 import { userDataContext } from '../context/UserContext';
@@ -8,34 +8,35 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("")
-  const {user , setUser} = useContext(userDataContext)
+  const { user, setUser } = useContext(userDataContext)
+  const [avatar, setAvatar] = useState()
   const navigate = useNavigate()
 
   useEffect(() => {
-    console.log("user :" , user)
-  } , [user])
+    console.log("user :", user)
+  }, [user])
 
 
   const handleSubmit = async (e) => {
 
     e.preventDefault();
 
-    const userData = {
-      name : name,
-      email : email,
-      password : password
-    }
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("avatar", avatar); 
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URI}/users/register` , userData , {withCredentials : true});
+      const response = await axios.post(`${import.meta.env.VITE_API_URI}/users/register`, formData, { withCredentials: true , headers : { "Content-Type": "multipart/form-data",} });
       const data = response.data;
-  
+
       if (data.success === true) {
         setUser(data.user)
-        localStorage.setItem("user" , JSON.stringify(data.user))
+        localStorage.setItem("user", JSON.stringify(data.user))
         navigate(`/`)
       }
-  
+
       setName("")
       setEmail("")
       setPassword("")
@@ -82,9 +83,17 @@ function Register() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button 
-              onClick={handleSubmit}
-              className='w-full bg-black text-white py-3 font-semibold text-xl rounded-lg '>Register</button>
+
+              <input
+                type="file"
+                accept="image/*"
+                className='rounded-lg border-[1px] outline-none w-full py-3 px-3 test-xl file:cursor-pointer'
+                onChange={(e) => setAvatar(e.target.files[0])}
+              />
+
+              <button
+                onClick={handleSubmit}
+                className='w-full bg-black text-white py-3 font-semibold text-xl rounded-lg '>Register</button>
 
               <h3 className='text-center'>Already have Account? <span className='text-blue-500'><Link to={"/login"}>Login Here</Link></span></h3>
             </form>
