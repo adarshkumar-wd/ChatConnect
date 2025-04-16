@@ -30,11 +30,11 @@ function ChatPage() {
       if (selectedMessage._id && selectedMessage.sender && selectedMessage.receiver) {
         const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/sender/${selectedMessage.sender}/receiver/${selectedMessage.receiver}/deletedBy/${sender}`, { withCredentials: true });
         // console.log("response : ", response.data.deletedMessage);
-  
+
         if (!response.data.deletedMessage.success) {
           console.log(response.data.message || "Select valid message");
         }
-  
+
         setUpdateDeleteMessageFlag(!updateDeleteMessageFlag);
         setIsDeletePopUpOpen(false)
       } else {
@@ -46,7 +46,7 @@ function ChatPage() {
 
     } catch (error) {
       setIsDeletePopUpOpen(false);
-      console.log("Delete message from sender error : " , error);
+      console.log("Delete message from sender error : ", error);
     }
   }
 
@@ -57,7 +57,7 @@ function ChatPage() {
     try {
       if (selectedMessage._id) {
         const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
-        console.log("response : " , response);
+        console.log("response : ", response);
         setIsDeletePopUpOpen(false)
       } else {
         console.log("Data not found properly..")
@@ -72,7 +72,7 @@ function ChatPage() {
   }
 
   useEffect(() => {
-    socket.on("messageDeleted" , () => {
+    socket.on("messageDeleted", () => {
       setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
     })
   })
@@ -114,16 +114,16 @@ function ChatPage() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-user/${receiver}`, { withCredentials: true });
         const data = response.data;
-  
-  
+
+
         if (data.success === true) {
           setUser(data.user)
           setReceiverSocket(data.user?.socketId)
           // console.log("Receiver socket Id : ", data.user?.socketId);
-  
+
         }
       } catch (error) {
-        console.log("fetching receiver error : " , error);
+        console.log("fetching receiver error : ", error);
       }
 
     };
@@ -149,16 +149,16 @@ function ChatPage() {
       try {
         const response = await axios.get(`${import.meta.env.VITE_API_URI}/messages/get-msg/${receiver}/${sender}`, { withCredentials: true });
         const data = response.data
-  
+
         if (data.success === true) {
           setConversation(data.messages)
         }
       } catch (error) {
-        console.log("Fetching message from backend error : " , error);
+        console.log("Fetching message from backend error : ", error);
       }
     }
     fetchMessage()
-  }, [receiver, sender , deleteMessageFromDbFlag])
+  }, [receiver, sender, deleteMessageFromDbFlag])
 
   // FETCH DELETED MESSAGES...
 
@@ -169,7 +169,7 @@ function ChatPage() {
         const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}`, { withCredentials: true });
         setDeletedMessages(() => [...response.data.messages]);
       } catch (error) {
-        console.log("Deleted message fetching error : " , error);
+        console.log("Deleted message fetching error : ", error);
       }
     }
     fetchDeletedMessage();
@@ -214,6 +214,10 @@ function ChatPage() {
     };
   }, []);
 
+  useEffect(() => {
+    window.addEventListener("click" , () => setIsDeletePopUpOpen(false));
+  })
+
 
   return (
 
@@ -241,10 +245,21 @@ function ChatPage() {
 
           <div className='relative w-full h-full bg-red-50 py-3 px-3 flex flex-col gap-16 overflow-y-scroll scrollbar-none' >
 
-            <div className={`${isDeletePopUpOpen ? "" : "hidden"} bg-white absolute w-[60%] top-[50%] z-20 -translate-y-1/2 left-[50%] -translate-x-1/2 px-4 py-3 border-1 border-black text-red-400 text-2xl font-semibold rounded-lg`}>
-              <p onClick={handleDeleteFromSender} className='cursor-pointer'>Delete from me</p>
-              <p onClick={handleDeleteMessageFromBothUser} className='cursor-pointer'>Delete from both</p>
+            <div className={`${isDeletePopUpOpen ? "" : "hidden"} bg-white absolute w-[60%] top-[50%] z-20 -translate-y-1/2 left-[50%] -translate-x-1/2 px-6 py-5 shadow-xl border border-gray-300 text-red-500 text-xl font-semibold rounded-2xl space-y-4`}>
+              <p
+                onClick={handleDeleteFromSender}
+                className='cursor-pointer hover:bg-red-100 transition-all duration-200 px-4 py-2 rounded-md text-center'
+              >
+                🗑️ Delete from me
+              </p>
+              <p
+                onClick={handleDeleteMessageFromBothUser}
+                className='cursor-pointer hover:bg-red-100 transition-all duration-200 px-4 py-2 rounded-md text-center'
+              >
+                ❌ Delete from both
+              </p>
             </div>
+
 
             {socket.connected ?
               <div className='w-full h-full flex flex-col overflow-y-scroll scrollbar-none'>
