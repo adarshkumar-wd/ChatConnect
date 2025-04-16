@@ -29,7 +29,7 @@ function NavBar() {
                 className='w-full text-[25px] font-medium sm:hidden'><IoMdArrowBack /></div>
     
                 <div className=' w-14 h-14 border-1 border-gray-500 rounded-full overflow-hidden '>
-                  <img className='w-full h-full object-cover' src="src/assets/default_avatar.png" alt="" />
+                  <img className='w-full h-full object-cover' src={user.avatar} alt="" />
                 </div>
     
                 <p className='font-semibold text-xl tracking-tight'>{user.name}</p>

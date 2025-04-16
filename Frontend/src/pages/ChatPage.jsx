@@ -233,7 +233,7 @@ function ChatPage() {
               <Link to={"/"} className='font-medium text-2xl mr-2'><IoMdArrowBack /></Link>
 
               <div className='w-12 h-12 overflow-hidden rounded-full'>
-                <img className='w-full h-full object-cover' src="https://static.vecteezy.com/system/resources/previews/001/840/618/original/picture-profile-icon-male-icon-human-or-people-sign-and-symbol-free-vector.jpg" alt="" />
+                <img className='w-full h-full object-cover' src={user.avatar} alt="" />
               </div>
 
               <h3 className='font-medium text-xl'><p>{user.name}</p></h3>

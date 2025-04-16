@@ -12,7 +12,7 @@ function UserCard({prop}) {
         className='w-[18rem] flex items-center justify-around gap-2 px-7 py-4 border-1 border-black rounded-lg cursor-pointer'>
 
             <div className='w-10 h-10 overflow-hidden rounded-full'>
-                <img className='w-full h-full object-cover' src="src/assets/default_avatar.png" alt="" />
+                <img className='w-full h-full object-cover' src={prop.user?.avatar} alt="" />
             </div>
 
             <p className='font-medium'>{prop.user.name}</p>
