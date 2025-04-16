@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import Register from "./pages/Register"
 import ChatPage from './pages/ChatPage'
 import ValidateHome from './pages/ValidateHome'
+import UserLogout from './pages/UserLogout'
 
 function App() {
   return (
@@ -17,6 +18,11 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/chat-page/:userId/:sender" element={<ChatPage />} />
+      <Route path="/logout" element={
+        <ValidateHome>
+          <UserLogout />
+        </ValidateHome>
+      } />
     </Routes>
   )
 }

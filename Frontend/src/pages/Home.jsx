@@ -39,7 +39,7 @@ function Home() {
   return (
     <>
 
-      <main className='w-full overflow-y-scroll overflow-x-hidden'>
+      <main className='w-full overflow-y-scroll overflow-x-hidden '>
 
         <NavBar />
 

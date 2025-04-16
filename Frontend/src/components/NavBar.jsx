@@ -1,13 +1,14 @@
 import React , {useState} from 'react'
-import { userDataContext } from '../context/UserContext'
 import { IoIosOptions } from "react-icons/io";
 import { CiLogout } from "react-icons/ci";
 import { IoMdArrowBack } from "react-icons/io";
+import { useNavigate } from 'react-router-dom';
 
 function NavBar() {
 
     const user = JSON.parse(localStorage.getItem("user"))
     const [isSideBarOpen, setIsSideBarOpen] = useState(false)
+    const navigate = useNavigate();
 
   return (
 
@@ -33,7 +34,7 @@ function NavBar() {
     
                 <p className='font-semibold text-xl tracking-tight'>{user.name}</p>
     
-                <p className='flex text-[17px] items-center text-blue-500 gap-2'><span>Logout</span><CiLogout /></p>
+                <p className='flex text-[17px] items-center text-blue-500 gap-2'><button onClick={() => navigate("/logout")} className=' p-1 cursor-pointer'>Logout</button><CiLogout /></p>
     
               </div>
     
