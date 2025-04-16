@@ -20,34 +20,36 @@ function ChatPage() {
   const [deletedMessages, setDeletedMessages] = useState([]);
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
 
-// SAVE DELETED MESSAGE TO THE BACKEND...
+  // SAVE DELETED MESSAGE TO THE BACKEND...
 
   const handleDeleteFromSender = async () => {
 
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/sender/${selectedMessage.sender}/receiver/${selectedMessage.receiver}/deletedBy/${sender}` , {withCredentials : true});
-        // console.log("response : " , response.data.deletedMessage.sender);
+      console.log(selectedMessage._id, selectedMessage.sender, selectedMessage.receiver);
 
-        if (!response.data.deletedMessage.success) {
-            console.log(response.data.message || "Select valid message");
-        }
+      const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/sender/${selectedMessage.sender}/receiver/${selectedMessage.receiver}/deletedBy/${sender}`, { withCredentials: true });
+      console.log("response : ", response.data.deletedMessage);
 
-        setUpdateDeleteMessageFlag(!updateDeleteMessageFlag);
-        setIsDeletePopUpOpen(false)
+      if (!response.data.deletedMessage.success) {
+        console.log(response.data.message || "Select valid message");
+      }
+
+      setUpdateDeleteMessageFlag(!updateDeleteMessageFlag);
+      setIsDeletePopUpOpen(false)
     } catch (error) {
-        console.log(error)
+      console.log(error)
     }
-}
+  }
 
-//
+  //
 
-const handleDeleteMessageFromBothUser = async () => {
+  const handleDeleteMessageFromBothUser = async () => {
 
-  const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
+    const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
 
-}
+  }
 
-// HANDLE DELETE POPUP
+  // HANDLE DELETE POPUP
 
   const handleMessageClick = (e, msg) => {
 
@@ -72,7 +74,7 @@ const handleDeleteMessageFromBothUser = async () => {
       }
     }
   }, []);
-  
+
 
   // FETCH RECEIVER
 
@@ -87,8 +89,8 @@ const handleDeleteMessageFromBothUser = async () => {
       if (data.success === true) {
         setUser(data.user)
         setReceiverSocket(data.user?.socketId)
-        console.log("Receiver socket Id : " , data.user?.socketId);
-        
+        console.log("Receiver socket Id : ", data.user?.socketId);
+
       }
 
     };
@@ -100,14 +102,14 @@ const handleDeleteMessageFromBothUser = async () => {
   // Handle Receiver Socket Updation
 
   useEffect(() => {
-    socket.on("updation" , (receiverSocket , receiverId) => {
+    socket.on("updation", (receiverSocket, receiverId) => {
       if (receiver === receiverId) {
         setReceiverSocket(receiverSocket)
       }
     })
   })
 
-//  FETCH MESSAGES FROM THE BACKEND....
+  //  FETCH MESSAGES FROM THE BACKEND....
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -121,27 +123,27 @@ const handleDeleteMessageFromBothUser = async () => {
     fetchMessage()
   }, [receiver, sender])
 
-// FETCH DELETED MESSAGES...
+  // FETCH DELETED MESSAGES...
 
-useEffect(() => {
+  useEffect(() => {
 
-  const fetchDeletedMessage = async () => {
-    const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}` , {withCredentials : true});
-    setDeletedMessages(() => [...response.data.messages]);
-  }
-  fetchDeletedMessage();
+    const fetchDeletedMessage = async () => {
+      const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}`, { withCredentials: true });
+      setDeletedMessages(() => [...response.data.messages]);
+    }
+    fetchDeletedMessage();
 
-} , [updateDeleteMessageFlag]);
+  }, [updateDeleteMessageFlag]);
 
-//  UPDATE FILTERED MESSAGE....
+  //  UPDATE FILTERED MESSAGE....
 
-useEffect(() => {
-  const deletedMessageSet = new Set(deletedMessages.map((msg) => {if (msg.deletedBy === sender) return msg.messageId}))
-  setFilteredMessages(() => conversation.filter((msg) => !deletedMessageSet.has(msg._id)));
-  
-}, [deletedMessages , conversation])
+  useEffect(() => {
+    const deletedMessageSet = new Set(deletedMessages.map((msg) => { if (msg.deletedBy === sender) return msg.messageId }))
+    setFilteredMessages(() => conversation.filter((msg) => !deletedMessageSet.has(msg._id)));
 
-// SEND MESSAGE
+  }, [deletedMessages, conversation])
+
+  // SEND MESSAGE
 
   const sendMessage = async (e) => {
 
@@ -149,27 +151,27 @@ useEffect(() => {
     // socket.connect()
     socket.emit("message", { receiverS, message, receiver, sender })
 
-    setFilteredMessages((prevMessages) => [...prevMessages, { sender : sender, receiver : receiver, message }]);
+    setFilteredMessages((prevMessages) => [...prevMessages, { sender: sender, receiver: receiver, message }]);
 
     setMessage("")
   }
 
-// RECEIVE MESSAGE...
+  // RECEIVE MESSAGE...
 
-useEffect(() => {
-  const handleReceiveMessage = (message) => {
-    // console.log("message : " ,  message)
-    setFilteredMessages((prevMessages) => [...prevMessages, {
-      sender: receiver, receiver: sender, message
-    }]);
-  };
+  useEffect(() => {
+    const handleReceiveMessage = (message) => {
+      // console.log("message : " ,  message)
+      setFilteredMessages((prevMessages) => [...prevMessages, {
+        sender: receiver, receiver: sender, message
+      }]);
+    };
 
-  socket.on("receivedMessage", handleReceiveMessage);
+    socket.on("receivedMessage", handleReceiveMessage);
 
-  return () => {
-    socket.off("receivedMessage", handleReceiveMessage);
-  };
-}, []); 
+    return () => {
+      socket.off("receivedMessage", handleReceiveMessage);
+    };
+  }, []);
 
 
   return (
@@ -205,13 +207,17 @@ useEffect(() => {
 
             {socket.connected ?
               <div className='w-full h-full flex flex-col overflow-y-scroll' style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-                {
-                  filteredMessages.map((msg, index) => (
-                    <div onContextMenu={(e) => handleMessageClick(e, msg)} key={index} className='relative mb-15 cursor-pointer'>
-                      <h3 className={`absolute ${msg.sender === sender ? "right-3" : "left-3"} flex flex-wrap w-fit px-2 py-2 rounded-xl bg-white max-w-[50%] overflow-hidden`}>{msg.message}</h3>
+                {filteredMessages.map((msg, index) => (
+                  <div
+                    onContextMenu={(e) => handleMessageClick(e, msg)}
+                    key={index}
+                    className={`w-full flex ${msg.sender === sender ? 'justify-end' : 'justify-start'} px-2 mb-4`}
+                  >
+                    <div className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-200'} px-4 py-2 rounded-xl bg-white text-black max-w-[70%] break-words shadow`}>
+                      {msg.message}
                     </div>
-                  ))
-                }
+                  </div>
+                ))}
               </div> :
               <div className='w-full h-full flex flex-col items-center justify-center text-red-500 gap-16 overflow-y-scroll'>
                 {

@@ -21,7 +21,7 @@ const io = new Server(server , {
 let user = {}
 
 io.on("connection" , (socket) => {
-    console.log('A user connected' , socket.id);
+    // console.log('A user connected' , socket.id);
 
     socket.on("register" , async (userId) => {
 

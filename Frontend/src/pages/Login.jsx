@@ -23,7 +23,7 @@ function Login() {
         const data = response.data;
         if (data.success === true) {
             setUser(data.user);
-            console.log(data.user)
+            // console.log(data.user)
             localStorage.setItem("user" , JSON.stringify(data.user))
             navigate(`/`);
         }

@@ -7,9 +7,9 @@ const router = Router()
 router.post("/register" , registerUser)
 router.post("/login" , loginUser)
 router.get("/logout" , authUser , logoutUser)
-router.get("/get-user/:userId" , authUser , getUserById)
+router.get("/get-user/:userId" , getUserById)
 router.get("/validate-token" , validateToken)
-router.get("/get-users" , authUser , getAllUsers)
+router.get("/get-users/sender/:sender" , getAllUsers)
 router.get("/update-status/:userId"  , updateStatus)
 
 export default router

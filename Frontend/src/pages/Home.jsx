@@ -14,26 +14,12 @@ function Home() {
   const user = JSON.parse(localStorage.getItem("user"))
   const sender = user._id
 
-  // useEffect(() => {
-  //   socket.on("connect", () => { // Ye actual userId backend se lo (login ke baad)
-  //     socket.emit("user_connected", sender);
-  //   });
-  // })
-
-
-  // useEffect(() => {
-  //   if (sender) {
-  //     socket.emit("register", sender)
-  //   }
-
-  // }, [sender])
-
 
   useEffect(() => {
 
     const fetchUsers = async () => {
 
-      const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users`, { withCredentials: true });
+      const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
 
       const data = response.data
 

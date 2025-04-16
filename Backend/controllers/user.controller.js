@@ -181,9 +181,9 @@ export const validateToken = async (req , res) => {
 
 export const getAllUsers = async (req , res) => {
 
-    const user = req?.user;
+    const {sender} = req.params;
 
-    const users = await userModel.find({_id : {$ne : user._id}}).select("-password")
+    const users = await userModel.find({_id : {$ne : sender}}).select("-password")
 
     return res.status(200).json({ success: true, users : users , message: "Users fetched successfully.." });
 
