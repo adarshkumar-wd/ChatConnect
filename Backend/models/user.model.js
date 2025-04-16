@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema({
     status : {
         type : String,
         default : "offline"
+    },
+
+    avatar : {
+        type : String,
+        require : [true , "Avatar is mandatory : user-model"]
     }
 
 } , {timestamps : true})

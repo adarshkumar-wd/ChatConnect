@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { loginUser, registerUser , logoutUser, getUserById, validateToken, getAllUsers, updateStatus } from "../controllers/user.controller.js";
 import { authUser } from "../middlewares/authUser.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router()
 
-router.post("/register" , registerUser)
+router.post("/register", upload.single("avatar") , registerUser)
 router.post("/login" , loginUser)
 router.get("/logout" , authUser , logoutUser)
 router.get("/get-user/:userId" , getUserById)

@@ -1,6 +1,7 @@
 import { userModel } from "../models/user.model.js"
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 export const registerUser = async (req, res) => {
 
@@ -21,11 +22,24 @@ export const registerUser = async (req, res) => {
             return res.status(400).json({ success: false, message: "Email already exist.." });
         }
 
+        const avatarLocalPath = req.file?.path
+
+        if (!avatarLocalPath) {
+            return res.status(400).json({ success: false, message: "Avatar is mandatory.." });
+        }
+
+        const avatar = await uploadOnCloudinary(avatarLocalPath);
+
+        if (!avatar) {
+            return res.status(500).json({ success: false, message: "Something went wrong while uploading the avatar.." });
+        }
+
         const createUser = await userModel.create(
             {
                 name: name,
                 email: email,
-                password: password
+                password: password,
+                avatar : avatar.url
             }
         )
 
