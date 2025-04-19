@@ -21,6 +21,8 @@ function ChatPage() {
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
   const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
 
+  console.log("sender : " , sender)
+
   // SAVE DELETED MESSAGE TO THE BACKEND...
 
   const handleDeleteFromSender = async () => {
@@ -50,7 +52,7 @@ function ChatPage() {
     }
   }
 
-  //
+  // Delete message from both user
 
   const handleDeleteMessageFromBothUser = async () => {
 
@@ -71,21 +73,22 @@ function ChatPage() {
 
   }
 
+  // Sender delete the message from both - socket event (Signal)
+
   useEffect(() => {
     socket.on("messageDeleted", () => {
       setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
     })
   })
 
-
   // HANDLE DELETE POPUP
 
   const handleMessageClick = (e, msg) => {
 
     e.preventDefault();
+    console.log("msg : " , msg)
     setIsDeletePopUpOpen(true);
     setSelectedMessage(msg)
-
   };
 
   // REGISTER USER....
@@ -103,7 +106,6 @@ function ChatPage() {
       }
     }
   }, []);
-
 
   // FETCH RECEIVER
 
@@ -181,7 +183,7 @@ function ChatPage() {
   useEffect(() => {
     const deletedMessageSet = new Set(deletedMessages.map((msg) => { if (msg.deletedBy === sender) return msg.messageId }))
     setFilteredMessages(() => conversation.filter((msg) => !deletedMessageSet.has(msg._id)));
-
+    console.log("filtered again...")
   }, [deletedMessages, conversation])
 
   // SEND MESSAGE
@@ -201,10 +203,8 @@ function ChatPage() {
 
   useEffect(() => {
     const handleReceiveMessage = (message) => {
-      // console.log("message : " ,  message)
-      setFilteredMessages((prevMessages) => [...prevMessages, {
-        sender: receiver, receiver: sender, message
-      }]);
+      console.log("message : " ,  message)
+      setFilteredMessages((prevMessages) => [...prevMessages, message]);
     };
 
     socket.on("receivedMessage", handleReceiveMessage);
@@ -214,8 +214,10 @@ function ChatPage() {
     };
   }, []);
 
+  // Close delete Popup...
+
   useEffect(() => {
-    window.addEventListener("click" , () => setIsDeletePopUpOpen(false));
+    window.addEventListener("click", () => setIsDeletePopUpOpen(false));
   })
 
 
@@ -265,11 +267,12 @@ function ChatPage() {
               <div className='w-full h-full flex flex-col overflow-y-scroll scrollbar-none'>
                 {filteredMessages.map((msg, index) => (
                   <div
-                    onContextMenu={(e) => handleMessageClick(e, msg)}
                     key={index}
                     className={`w-full flex ${msg.sender === sender ? 'justify-end' : 'justify-start'} px-2 mb-4`}
                   >
-                    <div className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-100'} cursor-pointer px-4 py-2 rounded-xl text-black max-w-[70%] break-words shadow`}>
+                    <div 
+                    onDoubleClick={(e) => handleMessageClick(e, msg)}
+                    className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-100'} cursor-pointer px-4 py-2 rounded-xl text-black max-w-[70%] break-words shadow`}>
                       {msg.message}
                     </div>
                   </div>

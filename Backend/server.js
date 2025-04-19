@@ -42,8 +42,8 @@ io.on("connection" , (socket) => {
 
     socket.on("message" , async({receiverS , message , receiver , sender}) => {
         // console.log(`message : ${message} , to receiver : ${receiver} , rs : ${receiverS}  ,  send by ${sender}`)
-        const conversationCreated = await createConversation(message , receiver , sender);
-        io.to(receiverS).emit("receivedMessage" , message)
+        const newConversation = await createConversation(message , receiver , sender);
+        io.to(receiverS).emit("receivedMessage" , newConversation)
     })
 
     // socket.on("disconnect", async () => {

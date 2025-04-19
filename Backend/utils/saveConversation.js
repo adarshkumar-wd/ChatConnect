@@ -13,7 +13,7 @@ export const createConversation = async (message , receiver , sender) => {
             throw new Error("conversation not created...")
         }
     
-        return true
+        return newConversation
     } catch (error) {
         console.log(error)
     }
