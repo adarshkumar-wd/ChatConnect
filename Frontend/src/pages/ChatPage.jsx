@@ -17,9 +17,8 @@ function ChatPage() {
   const [isDeletePopUpOpen, setIsDeletePopUpOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState({});
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
-  const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
 
-  console.log("sender : " , sender)
+  // console.log("sender : " , sender)
 
   // Delete message from Sender...
 
@@ -158,7 +157,7 @@ function ChatPage() {
       }
     }
     fetchMessage()
-  }, [receiver, sender, deleteMessageFromDbFlag , updateDeleteMessageFlag])
+  }, [receiver, sender , updateDeleteMessageFlag])
 
   // SEND MESSAGE
 
