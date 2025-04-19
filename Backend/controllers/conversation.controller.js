@@ -25,9 +25,9 @@ export const getMessages = async (req , res) => {
         ]
     })
 
-    const deletedMessgageSet = new Set(deletedMessage.map((msg) => msg._id));
+    const deletedMessgageSet = new Set(deletedMessage.map((msg) => {if (msg.deletedBy.toString() === sender) return msg.messageId.toString()}));
 
-    const filteredMessages = messages.map((msg) => !deletedMessgageSet.has(msg._id))
+    const filteredMessages = messages.filter((msg) => !deletedMessgageSet.has(msg._id.toString()))
 
     return res.status(200).json({success : true , messages : filteredMessages , message : "Message successfully fetched.."})
 

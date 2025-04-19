@@ -16,14 +16,12 @@ function ChatPage() {
   const [receiverS, setReceiverSocket] = useState()
   const [isDeletePopUpOpen, setIsDeletePopUpOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState({});
-  const [filteredMessages, setFilteredMessages] = useState([]);
-  const [deletedMessages, setDeletedMessages] = useState([]);
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
   const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
 
   console.log("sender : " , sender)
 
-  // SAVE DELETED MESSAGE TO THE BACKEND...
+  // Delete message from Sender...
 
   const handleDeleteFromSender = async () => {
 
@@ -59,8 +57,8 @@ function ChatPage() {
     try {
       if (selectedMessage._id) {
         const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
-        console.log("response : ", response);
         setIsDeletePopUpOpen(false)
+        setUpdateDeleteMessageFlag
       } else {
         console.log("Data not found properly..")
         setIsDeletePopUpOpen(false)
@@ -160,31 +158,7 @@ function ChatPage() {
       }
     }
     fetchMessage()
-  }, [receiver, sender, deleteMessageFromDbFlag])
-
-  // FETCH DELETED MESSAGES...
-
-  useEffect(() => {
-
-    const fetchDeletedMessage = async () => {
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URI}/delete/message/get/firstuser/${sender}/seconduser/${receiver}`, { withCredentials: true });
-        setDeletedMessages(() => [...response.data.messages]);
-      } catch (error) {
-        console.log("Deleted message fetching error : ", error);
-      }
-    }
-    fetchDeletedMessage();
-
-  }, [updateDeleteMessageFlag]);
-
-  //  UPDATE FILTERED MESSAGE....
-
-  useEffect(() => {
-    const deletedMessageSet = new Set(deletedMessages.map((msg) => { if (msg.deletedBy === sender) return msg.messageId }))
-    setFilteredMessages(() => conversation.filter((msg) => !deletedMessageSet.has(msg._id)));
-    console.log("filtered again...")
-  }, [deletedMessages, conversation])
+  }, [receiver, sender, deleteMessageFromDbFlag , updateDeleteMessageFlag])
 
   // SEND MESSAGE
 
@@ -194,7 +168,7 @@ function ChatPage() {
     // socket.connect()
     socket.emit("message", { receiverS, message, receiver, sender })
 
-    setFilteredMessages((prevMessages) => [...prevMessages, { sender: sender, receiver: receiver, message }]);
+    setConversation((prevMessages) => [...prevMessages, { sender: sender, receiver: receiver, message }]);
 
     setMessage("")
   }
@@ -204,7 +178,7 @@ function ChatPage() {
   useEffect(() => {
     const handleReceiveMessage = (message) => {
       console.log("message : " ,  message)
-      setFilteredMessages((prevMessages) => [...prevMessages, message]);
+      setConversation((prevMessages) => [...prevMessages, message]);
     };
 
     socket.on("receivedMessage", handleReceiveMessage);
@@ -219,7 +193,6 @@ function ChatPage() {
   useEffect(() => {
     window.addEventListener("click", () => setIsDeletePopUpOpen(false));
   })
-
 
   return (
 
@@ -256,7 +229,7 @@ function ChatPage() {
               </p>
               <p
                 onClick={handleDeleteMessageFromBothUser}
-                className='cursor-pointer hover:bg-red-100 transition-all duration-200 px-4 py-2 rounded-md text-center'
+                className={`${selectedMessage.sender === sender ? "" : "hidden"} cursor-pointer hover:bg-red-100 transition-all duration-200 px-4 py-2 rounded-md text-center`}
               >
                 ❌ Delete from both
               </p>
@@ -265,7 +238,7 @@ function ChatPage() {
 
             {socket.connected ?
               <div className='w-full h-full flex flex-col overflow-y-scroll scrollbar-none'>
-                {filteredMessages.map((msg, index) => (
+                {conversation.map((msg, index) => (
                   <div
                     key={index}
                     className={`w-full flex ${msg.sender === sender ? 'justify-end' : 'justify-start'} px-2 mb-4`}
