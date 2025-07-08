@@ -139,8 +139,9 @@ function ChatPage() {
   const updationOnSender = useCallback((newMessage) => setConversation((prevMessages) => [...prevMessages, newMessage]), [])
 
   const handleReceiveMessage = useCallback((message) => {
+    console.log("Received Socket runs....")
     setConversation((prevMessages) => [...prevMessages, message]);
-  }, [])
+  }, [conversation])
 
   const handleMessageDeleted = useCallback(() => {
       setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
@@ -160,13 +161,14 @@ function ChatPage() {
       socket.off("messageDeleted", handleMessageDeleted);
 
     }
-  })
+  } , [])
 
   //  FETCH MESSAGES FROM THE BACKEND....
 
   useEffect(() => {
     const fetchMessage = async () => {
       try {
+        
         const response = await axios.get(`${import.meta.env.VITE_API_URI}/messages/get-msg/${receiver}/${sender}`, { withCredentials: true });
         const data = response.data
 
@@ -178,7 +180,7 @@ function ChatPage() {
       }
     }
     fetchMessage()
-  }, [receiver, sender, updateDeleteMessageFlag, deleteMessageFromDbFlag])
+  }, [updateDeleteMessageFlag, deleteMessageFromDbFlag])
 
   // SEND MESSAGE
 
@@ -190,6 +192,10 @@ function ChatPage() {
 
     setMessage("")
   }
+
+  useEffect(() => {
+    console.log("conversation : " , conversation)
+  } , [conversation])
 
   // Close delete Popup...
 

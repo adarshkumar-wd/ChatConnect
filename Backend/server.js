@@ -44,7 +44,7 @@ io.on("connection" , (socket) => {
         // console.log(`message : ${message} , to receiver : ${receiver} , rs : ${receiverS}  ,  send by ${sender}`)
         const newConversation = await createConversation(message , receiver , sender);
         io.to(receiverS).emit("receivedMessage" , newConversation);
-        io.emit("updataionOnSender" , newConversation);
+        socket.emit("updataionOnSender" , newConversation);
     })
     
 });
