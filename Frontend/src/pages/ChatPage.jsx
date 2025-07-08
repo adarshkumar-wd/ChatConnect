@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { IoMdArrowBack } from "react-icons/io";
 import axios from "axios"
 import { useNavigate, useParams, Link } from 'react-router-dom';
@@ -17,6 +17,9 @@ function ChatPage() {
   const [isDeletePopUpOpen, setIsDeletePopUpOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState({});
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
+  const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
+
+  const [test, setTest] = useState(false);
 
   // console.log("sender : " , sender)
 
@@ -72,18 +75,12 @@ function ChatPage() {
 
   // Sender delete the message from both - socket event (Signal)
 
-  useEffect(() => {
-    socket.on("messageDeleted", () => {
-      setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
-    })
-  })
-
   // HANDLE DELETE POPUP
 
   const handleMessageClick = (e, msg) => {
 
     e.preventDefault();
-    console.log("msg : " , msg)
+    console.log("msg : ", msg)
     setIsDeletePopUpOpen(true);
     setSelectedMessage(msg)
   };
@@ -133,12 +130,36 @@ function ChatPage() {
 
   // Handle Receiver Socket Updation
 
+  const handleUpdation = useCallback((receiverSocket, receiverId) => {
+    if (receiver === receiverId) {
+      setReceiverSocket(receiverSocket)
+    }
+  }, [])
+
+  const updationOnSender = useCallback((newMessage) => setConversation((prevMessages) => [...prevMessages, newMessage]), [])
+
+  const handleReceiveMessage = useCallback((message) => {
+    setConversation((prevMessages) => [...prevMessages, message]);
+  }, [])
+
+  const handleMessageDeleted = useCallback(() => {
+      setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
+    } , [])
+
   useEffect(() => {
-    socket.on("updation", (receiverSocket, receiverId) => {
-      if (receiver === receiverId) {
-        setReceiverSocket(receiverSocket)
-      }
-    })
+    socket.on("updation", handleUpdation);
+    socket.on("updataionOnSender", updationOnSender);
+    socket.on("receivedMessage", handleReceiveMessage);
+    socket.on("messageDeleted", handleMessageDeleted);
+
+
+    return () => {
+      socket.off("updation", handleUpdation)
+      socket.off("updataionOnSender", updationOnSender);
+      socket.off("receivedMessage", handleReceiveMessage);
+      socket.off("messageDeleted", handleMessageDeleted);
+
+    }
   })
 
   //  FETCH MESSAGES FROM THE BACKEND....
@@ -157,7 +178,7 @@ function ChatPage() {
       }
     }
     fetchMessage()
-  }, [receiver, sender , updateDeleteMessageFlag])
+  }, [receiver, sender, updateDeleteMessageFlag, deleteMessageFromDbFlag])
 
   // SEND MESSAGE
 
@@ -167,25 +188,8 @@ function ChatPage() {
     // socket.connect()
     socket.emit("message", { receiverS, message, receiver, sender })
 
-    setConversation((prevMessages) => [...prevMessages, { sender: sender, receiver: receiver, message }]);
-
     setMessage("")
   }
-
-  // RECEIVE MESSAGE...
-
-  useEffect(() => {
-    const handleReceiveMessage = (message) => {
-      console.log("message : " ,  message)
-      setConversation((prevMessages) => [...prevMessages, message]);
-    };
-
-    socket.on("receivedMessage", handleReceiveMessage);
-
-    return () => {
-      socket.off("receivedMessage", handleReceiveMessage);
-    };
-  }, []);
 
   // Close delete Popup...
 
@@ -242,9 +246,9 @@ function ChatPage() {
                     key={index}
                     className={`w-full flex ${msg.sender === sender ? 'justify-end' : 'justify-start'} px-2 mb-4`}
                   >
-                    <div 
-                    onDoubleClick={(e) => handleMessageClick(e, msg)}
-                    className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-100'} cursor-pointer px-4 py-2 rounded-xl text-black max-w-[70%] break-words shadow`}>
+                    <div
+                      onDoubleClick={(e) => handleMessageClick(e, msg)}
+                      className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-100'} cursor-pointer px-4 py-2 rounded-xl text-black max-w-[70%] break-words shadow`}>
                       {msg.message}
                     </div>
                   </div>

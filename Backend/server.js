@@ -43,30 +43,9 @@ io.on("connection" , (socket) => {
     socket.on("message" , async({receiverS , message , receiver , sender}) => {
         // console.log(`message : ${message} , to receiver : ${receiver} , rs : ${receiverS}  ,  send by ${sender}`)
         const newConversation = await createConversation(message , receiver , sender);
-        io.to(receiverS).emit("receivedMessage" , newConversation)
+        io.to(receiverS).emit("receivedMessage" , newConversation);
+        io.emit("updataionOnSender" , newConversation);
     })
-
-    // socket.on("disconnect", async () => {
-    //     const userId = user[socket.id]; 
-
-    //     if (!userId) {
-    //         console.log("No userId found for socket:", socket.id);
-    //         return;
-    //     }
-
-    //     try {
-    //         await userModel.findByIdAndUpdate(userId, { status: "offline"}, { new: true });
-    //         console.log(`User ${userId} is now offline.`);
-    //     } catch (error) {
-    //         console.log("Error updating user status:", error.message);
-    //     } finally {
-    //         delete user[socket.id]; 
-    //     }
-    // })
-
-    
-
-
     
 });
 
