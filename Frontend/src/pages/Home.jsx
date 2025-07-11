@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import UserCard from '../components/UserCard';
 import NavBar from '../components/NavBar';
-import { io } from "socket.io-client"
-import { useParams } from 'react-router-dom';
+// import { io } from "socket.io-client"
 
 
-export const socket = io("http://localhost:5500");
+// export const socket = io("http://localhost:5500");
 
 function Home() {
   const [users, setUsers] = useState([]);

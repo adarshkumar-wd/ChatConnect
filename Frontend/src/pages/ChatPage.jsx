@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { IoMdArrowBack } from "react-icons/io";
 import axios from "axios"
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { socket } from './Home';
+// import { socket } from './Home';
+import { useSocket } from '../context/SocketContext';
 import { HiDotsVertical } from "react-icons/hi";
 
 
@@ -18,6 +19,8 @@ function ChatPage() {
   const [selectedMessage, setSelectedMessage] = useState({});
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
   const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
+
+  const socket = useSocket();
 
   const [test, setTest] = useState(false);
 

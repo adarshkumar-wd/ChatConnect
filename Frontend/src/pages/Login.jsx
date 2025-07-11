@@ -1,14 +1,13 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios';
-import { userDataContext } from '../context/UserContext';
 import { HashLoader } from "react-spinners"
 
 function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { user, setUser } = useContext(userDataContext);
+    const [user , setUser] = useState();
     const [loding, setLoding] = useState(false);
     const navigate = useNavigate();
 

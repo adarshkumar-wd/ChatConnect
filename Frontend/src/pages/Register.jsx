@@ -1,7 +1,6 @@
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
-import { userDataContext } from '../context/UserContext';
 import { HashLoader } from 'react-spinners';
 
 function Register() {
