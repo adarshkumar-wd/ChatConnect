@@ -144,8 +144,8 @@ function ChatPage() {
   }, [conversation])
 
   const handleMessageDeleted = useCallback(() => {
-      setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
-    } , [])
+    setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
+  }, [])
 
   useEffect(() => {
     socket.on("updation", handleUpdation);
@@ -161,14 +161,14 @@ function ChatPage() {
       socket.off("messageDeleted", handleMessageDeleted);
 
     }
-  } , [])
+  }, [])
 
   //  FETCH MESSAGES FROM THE BACKEND....
 
   useEffect(() => {
     const fetchMessage = async () => {
       try {
-        
+
         const response = await axios.get(`${import.meta.env.VITE_API_URI}/messages/get-msg/${receiver}/${sender}`, { withCredentials: true });
         const data = response.data
 
@@ -194,8 +194,8 @@ function ChatPage() {
   }
 
   useEffect(() => {
-    console.log("conversation : " , conversation)
-  } , [conversation])
+    console.log("conversation : ", conversation)
+  }, [conversation])
 
   // Close delete Popup...
 
@@ -204,92 +204,122 @@ function ChatPage() {
   })
 
   return (
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
+      <main className="flex-1 flex justify-center items-center py-6 px-4">
+        <section className="w-full h-[90vh] max-w-2xl flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-indigo-100">
+          {/* Chat Header */}
+          <nav className="w-full flex items-center justify-between py-4 px-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-indigo-200">
+            <div className="flex items-center gap-4">
+              <Link to={"/"} className="text-indigo-600 hover:text-indigo-800 transition-colors">
+                <IoMdArrowBack className="w-6 h-6" />
+              </Link>
 
-    <>
-
-      <main className='w-screen h-screen flex justify-center bg-pink-100'>
-
-        <section className='w-full h-full  border-2 border-pink-300 flex flex-col justify-between items-center bg-pink-200 xs:w-[90%] xs2:w-[70%] sm:w-[60%] md:w-[50%] custom1:w-[40%] lg:w-[35%] custom2:w-[32%] xl:w-[29%]'>
-
-          <nav className='w-full flex gap-4 py-3 items-center px-3 justify-between border-b-[1px] border-b-black bg-red-100'>
-
-            <div className='flex items-center gap-5'>
-              <Link to={"/"} className='font-medium text-2xl mr-2'><IoMdArrowBack /></Link>
-
-              <div className='w-12 h-12 overflow-hidden rounded-full'>
-                <img className='w-full h-full object-cover' src={user.avatar} alt="" />
+              <div className="w-10 h-10 overflow-hidden rounded-full border-2 border-indigo-300">
+                <img
+                  className="w-full h-full object-cover"
+                  src={user.avatar}
+                  alt={user.name}
+                />
               </div>
 
-              <h3 className='font-medium text-xl'><p>{user.name}</p></h3>
+              <div>
+                <h3 className="font-semibold text-indigo-900">{user.name}</h3>
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span className="text-xs text-gray-500">Online</span>
+                </div>
+              </div>
             </div>
 
-            <h3 className='mr-2 text-xl font-medium'><HiDotsVertical /></h3>
-
+            <button className="p-2 rounded-full hover:bg-indigo-100 transition-colors">
+              <HiDotsVertical className="w-5 h-5 text-indigo-600" />
+            </button>
           </nav>
 
-          <div className='relative w-full h-full bg-red-50 py-3 px-3 flex flex-col gap-16 overflow-y-scroll scrollbar-none' >
+          {/* Chat Messages */}
+          <div className="relative flex-1 flex flex-col p-4 overflow-y-auto bg-gradient-to-b from-white to-indigo-50">
+            {/* Delete Popup */}
+            <div
+              className={`${isDeletePopUpOpen ? "block" : "hidden"} absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-white rounded-xl shadow-2xl border border-indigo-200 w-72 overflow-hidden`}
+            >
+              <div className="p-4 border-b border-indigo-100">
+                <h3 className="font-semibold text-indigo-900">Delete Message</h3>
+              </div>
 
-            <div className={`${isDeletePopUpOpen ? "" : "hidden"} bg-white absolute w-[60%] top-[50%] z-20 -translate-y-1/2 left-[50%] -translate-x-1/2 px-6 py-5 shadow-xl border border-gray-300 text-red-500 text-xl font-semibold rounded-2xl space-y-4`}>
-              <p
-                onClick={handleDeleteFromSender}
-                className='cursor-pointer hover:bg-red-100 transition-all duration-200 px-4 py-2 rounded-md text-center'
-              >
-                🗑️ Delete from me
-              </p>
-              <p
-                onClick={handleDeleteMessageFromBothUser}
-                className={`${selectedMessage.sender === sender ? "" : "hidden"} cursor-pointer hover:bg-red-100 transition-all duration-200 px-4 py-2 rounded-md text-center`}
-              >
-                ❌ Delete from both
-              </p>
+              <div className="py-2">
+                <button
+                  onClick={handleDeleteFromSender}
+                  className="w-full py-3 px-4 text-left text-red-500 hover:bg-red-50 transition-colors flex items-center gap-2"
+                >
+                  <span className="text-lg">🗑️</span>
+                  Delete from me
+                </button>
+
+                <button
+                  onClick={handleDeleteMessageFromBothUser}
+                  className={`${selectedMessage.sender === sender ? "flex" : "hidden"} w-full py-3 px-4 text-left text-red-500 hover:bg-red-50 transition-colors items-center gap-2`}
+                >
+                  <span className="text-lg">❌</span>
+                  Delete from both
+                </button>
+              </div>
             </div>
 
-
-            {socket.connected ?
-              <div className='w-full h-full flex flex-col overflow-y-scroll scrollbar-none'>
+            {/* Messages Container */}
+            {socket.connected ? (
+              <div className="flex flex-col gap-4">
                 {conversation.map((msg, index) => (
                   <div
                     key={index}
-                    className={`w-full flex ${msg.sender === sender ? 'justify-end' : 'justify-start'} px-2 mb-4`}
+                    className={`flex ${msg.sender === sender ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
                       onDoubleClick={(e) => handleMessageClick(e, msg)}
-                      className={`${msg.sender === sender ? 'bg-yellow-50' : 'bg-orange-100'} cursor-pointer px-4 py-2 rounded-xl text-black max-w-[70%] break-words shadow`}>
+                      className={`${msg.sender === sender
+                        ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-br-none'
+                        : 'bg-indigo-100 text-indigo-900 rounded-bl-none'} 
+                      max-w-[80%] px-4 py-3 rounded-2xl shadow-sm cursor-pointer transition-all duration-200 hover:shadow-md`}
+                    >
                       {msg.message}
                     </div>
                   </div>
                 ))}
-              </div> :
-              <div className='w-full h-full flex flex-col items-center justify-center text-red-500 gap-16 overflow-y-scroll'>
-                {
-                  <p className='text-2xl font-semibold'>You are Offline!</p>
-                }
-              </div>}
-
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center p-6">
+                <div className="bg-gradient-to-r from-indigo-100 to-purple-100 rounded-full p-6 mb-4">
+                  <div className="bg-gray-200 border-2 border-dashed rounded-full w-16 h-16 animate-pulse" />
+                </div>
+                <h3 className="text-xl font-semibold text-indigo-900">You're Offline</h3>
+                <p className="text-indigo-700 mt-2 max-w-md">
+                  Your messages will be sent when you reconnect to the internet
+                </p>
+              </div>
+            )}
           </div>
 
-          <footer className='bg-white w-full flex'>
+          {/* Message Input */}
+          <footer className="w-full p-4 bg-white border-t border-indigo-100">
+            <div className="flex gap-2">
+              <input
+                className="flex-1 rounded-full border border-indigo-200 focus:border-indigo-400 outline-none py-3 px-5 text-indigo-900 placeholder-indigo-300"
+                type="text"
+                placeholder="Type your message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
 
-            <input
-              className='w-[80%] rounded-lg border-[1px] outline-none py-3 px-3 test-xl'
-              type="text"
-              placeholder='Enter Your Message...'
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-
-            <button
-              onClick={sendMessage}
-              className='w-[20%] bg-black text-white py-3 font-semibold text-xl rounded-lg '>Send</button>
-
+              <button
+                onClick={sendMessage}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-full px-6 font-medium transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                Send
+              </button>
+            </div>
           </footer>
-
         </section>
-
       </main>
-
-    </>
-
+    </div>
   )
 }
 
