@@ -59,6 +59,7 @@ function ChatPage() {
     try {
       if (selectedMessage._id) {
         const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
+        console.log("responsec : " , response);
         setIsDeletePopUpOpen(false)
         setUpdateDeleteMessageFlag
       } else {
@@ -139,12 +140,12 @@ function ChatPage() {
   const updationOnSender = useCallback((newMessage) => setConversation((prevMessages) => [...prevMessages, newMessage]), [])
 
   const handleReceiveMessage = useCallback((message) => {
-    console.log("Received Socket runs....")
+    // console.log("Received Socket runs....")
     setConversation((prevMessages) => [...prevMessages, message]);
   }, [conversation])
 
   const handleMessageDeleted = useCallback(() => {
-    setDeleteMessageFromDbFlag(!deleteMessageFromDbFlag);
+    setDeleteMessageFromDbFlag(prev => !prev);
   }, [])
 
   useEffect(() => {
@@ -192,10 +193,6 @@ function ChatPage() {
 
     setMessage("")
   }
-
-  useEffect(() => {
-    console.log("conversation : ", conversation)
-  }, [conversation])
 
   // Close delete Popup...
 
