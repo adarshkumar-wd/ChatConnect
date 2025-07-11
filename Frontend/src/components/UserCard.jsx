@@ -16,7 +16,7 @@ function UserCard({prop}) {
             </div>
 
             <p className='font-medium'>{prop.user.name}</p>
-            <div className={`w-2 h-2 rounded-full ${prop.user.status === "online" ? "bg-green-500" : "bg-red-500"}`}></div>
+            {/* <div className={`w-2 h-2 rounded-full ${prop.user.status === "online" ? "bg-green-500" : "bg-red-500"}`}></div> */}
 
         </div>
 
