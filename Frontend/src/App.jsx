@@ -6,6 +6,7 @@ import Register from "./pages/Register"
 import ChatPage from './pages/ChatPage'
 import ValidateHome from './pages/ValidateHome'
 import UserLogout from './pages/UserLogout'
+import AddFriends from './pages/AddFriends'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <UserLogout />
         </ValidateHome>
       } />
+      <Route path="/add-friend" element={<AddFriends />} />
     </Routes>
   )
 }
