@@ -40,7 +40,13 @@ const userSchema = new mongoose.Schema({
     avatar : {
         type : String,
         require : [true , "Avatar is mandatory : user-model"]
-    }
+    },
+
+    friends : [
+        {
+            type : String
+        }
+    ]
 
 } , {timestamps : true})
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext, useCallback } from 'react'
 import { IoMdArrowBack } from "react-icons/io";
 import axios from "axios"
 import { useNavigate, useParams, Link } from 'react-router-dom';
-// import { socket } from './Home';
 import { useSocket } from '../context/SocketContext';
 import { HiDotsVertical } from "react-icons/hi";
 
@@ -19,14 +18,9 @@ function ChatPage() {
   const [selectedMessage, setSelectedMessage] = useState({});
   const [updateDeleteMessageFlag, setUpdateDeleteMessageFlag] = useState(true);
   const [deleteMessageFromDbFlag, setDeleteMessageFromDbFlag] = useState(false);
+  const [userStatusFlag, setUserStatusFlag] = useState(false);
 
   const socket = useSocket();
-
-  const [test, setTest] = useState(false);
-
-  // console.log("sender : " , sender)
-
-  // Delete message from Sender...
 
   const handleDeleteFromSender = async () => {
 
@@ -62,7 +56,7 @@ function ChatPage() {
     try {
       if (selectedMessage._id) {
         const response = await axios.put(`${import.meta.env.VITE_API_URI}/delete/message/${selectedMessage._id}/from-both-user`);
-        console.log("responsec : " , response);
+        console.log("responsec : ", response);
         setIsDeletePopUpOpen(false)
         setUpdateDeleteMessageFlag
       } else {
@@ -100,7 +94,11 @@ function ChatPage() {
         socket.on("connect", () => {
           // console.log("Registering with socket:", sender);
           socket.emit("register", sender);
+
         });
+        return () => {
+          socket.off("connect")
+        }
       }
     }
   }, []);
@@ -130,7 +128,7 @@ function ChatPage() {
 
     fetchUser()
 
-  }, [receiver, receiverS])
+  }, [receiver, receiverS, userStatusFlag])
 
   // Handle Receiver Socket Updation
 
@@ -156,6 +154,7 @@ function ChatPage() {
     socket.on("updataionOnSender", updationOnSender);
     socket.on("receivedMessage", handleReceiveMessage);
     socket.on("messageDeleted", handleMessageDeleted);
+    socket.on("user:online", () => setUserStatusFlag(prev => !prev));
 
 
     return () => {
@@ -163,7 +162,7 @@ function ChatPage() {
       socket.off("updataionOnSender", updationOnSender);
       socket.off("receivedMessage", handleReceiveMessage);
       socket.off("messageDeleted", handleMessageDeleted);
-
+      socket.off("user:online", () => setUserStatusFlag(prev => !prev));
     }
   }, [])
 

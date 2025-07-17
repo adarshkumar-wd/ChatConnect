@@ -25,7 +25,9 @@ function Login() {
 
             const data = response.data;
             if (data.success === true) {
+                console.log("hii")
                 setUser(data.user);
+                console.log("hii2")
                 // console.log(data.user)
                 localStorage.setItem("user", JSON.stringify(data.user))
                 navigate(`/`);

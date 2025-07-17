@@ -2,16 +2,31 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import UserCard from '../components/UserCard';
 import NavBar from '../components/NavBar';
-// import { io } from "socket.io-client"
+import { useSocket } from '../context/SocketContext';
 
-
-// export const socket = io("http://localhost:5500");
 
 function Home() {
   const [users, setUsers] = useState([]);
+  const [userStatusFlag, setuserStatusFlag] = useState(false)
   // const { sender } = useParams();
   const user = JSON.parse(localStorage.getItem("user"))
   const sender = user._id
+  const socket = useSocket();
+
+  useEffect(() => {
+    socket.emit("user:online" , {id : sender})
+  })
+
+  useEffect(() => {
+
+    const handler = () => setuserStatusFlag(prev => !prev);
+
+    socket.on("user:online" , handler)
+
+    return () => {
+      socket.off("user:online" , handler)
+    }
+  })
 
 
   useEffect(() => {
@@ -33,7 +48,7 @@ function Home() {
     }
     fetchUsers();
 
-  }, [])
+  }, [userStatusFlag])
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
