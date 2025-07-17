@@ -13,42 +13,8 @@ function Home() {
   const sender = user._id
   const socket = useSocket();
 
-  useEffect(() => {
-    socket.emit("user:online" , {id : sender})
-  })
 
-  useEffect(() => {
-
-    const handler = () => setuserStatusFlag(prev => !prev);
-
-    socket.on("user:online" , handler)
-
-    return () => {
-      socket.off("user:online" , handler)
-    }
-  })
-
-
-  useEffect(() => {
-
-    const fetchUsers = async () => {
-
-      try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
-
-        const data = response.data
-
-        if (data.success === true) {
-          setUsers(data.users)
-        }
-      } catch (error) {
-        console.log("fetchUsers error : ", error)
-      }
-
-    }
-    fetchUsers();
-
-  }, [userStatusFlag])
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">

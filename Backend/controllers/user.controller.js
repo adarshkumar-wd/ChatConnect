@@ -225,3 +225,15 @@ export const updateStatus = async (req , res) => {
     return res.status(200).json({success : true , message : "status updated..."})
 
 }
+
+export const getUser = async (req , res) => {
+
+    const user = req?.user;
+
+    if (!user) {
+        return res.status(410).json({success : false , message : "Un Authorised User.."})
+    }
+
+    return res.status(200).json({success : true , message : "User fetched Successfully..."})
+
+}

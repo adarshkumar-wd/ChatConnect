@@ -4,12 +4,14 @@ import './index.css'
 import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import SocketContext from './context/SocketContext.jsx'
+import UserContext from './context/userContext.jsx'
 
 createRoot(document.getElementById('root')).render(
-
-  <SocketContext>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </SocketContext>
+  <UserContext>
+    <SocketContext>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </SocketContext>
+  </UserContext>
 )
