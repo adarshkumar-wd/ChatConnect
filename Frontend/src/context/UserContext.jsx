@@ -1,14 +1,35 @@
-import { createContext, useEffect } from "react"
+import { createContext, useCallback, useEffect, useState } from "react"
+import axios from "axios";
 
 export const userContext = createContext();
 
-function UserContext({children}) {
+function UserContext({ children }) {
 
-    useEffect(() => {})
+  const [user, setUser] = useState()
+
+
+  useEffect(() => {
+
+    const getUser = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-user`, {
+          withCredentials: true
+        });
+        // console.log("data : " , response.data);
+        setUser(response?.data?.user);
+
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    getUser();
+  } , [])
+
 
   return (
-    <userContext.Provider>
-        {children}
+    <userContext.Provider value={user}>
+      {children}
     </userContext.Provider>
   )
 }

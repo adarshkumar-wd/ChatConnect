@@ -7,10 +7,6 @@ import { useSocket } from '../context/SocketContext';
 
 function Home() {
   const [users, setUsers] = useState([]);
-  const [userStatusFlag, setuserStatusFlag] = useState(false)
-  // const { sender } = useParams();
-  const user = JSON.parse(localStorage.getItem("user"))
-  const sender = user._id
   const socket = useSocket();
 
 

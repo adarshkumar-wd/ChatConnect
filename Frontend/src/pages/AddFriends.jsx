@@ -14,28 +14,28 @@ function AddFriends() {
         setFilteredUsers(prev => prev.filter(user => user?.name.toLowerCase().includes(searchTerm.toLowerCase())))
     }, [users])
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        const fetchUsers = async () => {
+    //     const fetchUsers = async () => {
 
-            try {
-                const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
+    //         try {
+    //             const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
 
-                const data = response.data
+    //             const data = response.data
 
-                console.log("data : " , data)
+    //             console.log("data : " , data)
 
-                if (data.success === true) {
-                    setUsers(data.users)
-                }
-            } catch (error) {
-                console.log("fetchUsers error : ", error)
-            }
+    //             if (data.success === true) {
+    //                 setUsers(data.users)
+    //             }
+    //         } catch (error) {
+    //             console.log("fetchUsers error : ", error)
+    //         }
 
-        }
-        fetchUsers();
+    //     }
+    //     fetchUsers();
 
-    }, [])
+    // }, [])
 
     useEffect(() => {
         console.log("users : " , users);

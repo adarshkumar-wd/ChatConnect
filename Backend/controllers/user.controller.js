@@ -234,6 +234,6 @@ export const getUser = async (req , res) => {
         return res.status(410).json({success : false , message : "Un Authorised User.."})
     }
 
-    return res.status(200).json({success : true , message : "User fetched Successfully..."})
+    return res.status(200).json({success : true , user : user , message : "User fetched Successfully..."})
 
 }

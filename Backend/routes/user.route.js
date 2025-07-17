@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { loginUser, registerUser , logoutUser, getUserById, validateToken, getAllUsers, updateStatus } from "../controllers/user.controller.js";
+import { loginUser, registerUser , logoutUser, getUserById, validateToken, getAllUsers, updateStatus , getUser } from "../controllers/user.controller.js";
 import { authUser } from "../middlewares/authUser.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
@@ -12,5 +12,6 @@ router.get("/get-user/:userId" , getUserById)
 router.get("/validate-token" , validateToken)
 router.get("/get-users/sender/:sender" , getAllUsers)
 router.get("/update-status/:userId"  , updateStatus)
+router.get("/get-user" , authUser , getUser )
 
 export default router
