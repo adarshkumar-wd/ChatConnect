@@ -198,6 +198,7 @@ export const validateToken = async (req , res) => {
 export const getAllUsers = async (req , res) => {
 
     const {sender} = req.params;
+    console.log("sender : " , sender)
 
     const users = await userModel.find({_id : {$ne : sender}}).select("-password")
 

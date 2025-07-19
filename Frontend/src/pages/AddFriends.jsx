@@ -1,46 +1,58 @@
-import { useState , useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { FaPlus, FaSearch } from 'react-icons/fa';
 import axios from 'axios';
+import { userContext } from '../context/userContext';
 
 function AddFriends() {
 
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const user = useContext(userContext);
+    const [sender, setSender] = useState();
 
     // Filter users based on search term
 
     useEffect(() => {
-        setFilteredUsers(prev => prev.filter(user => user?.name.toLowerCase().includes(searchTerm.toLowerCase())))
-    }, [users])
-
-    // useEffect(() => {
-
-    //     const fetchUsers = async () => {
-
-    //         try {
-    //             const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
-
-    //             const data = response.data
-
-    //             console.log("data : " , data)
-
-    //             if (data.success === true) {
-    //                 setUsers(data.users)
-    //             }
-    //         } catch (error) {
-    //             console.log("fetchUsers error : ", error)
-    //         }
-
-    //     }
-    //     fetchUsers();
-
-    // }, [])
+        setSender(user?._id)
+    }, [user])
 
     useEffect(() => {
-        console.log("users : " , users);
-        
-    } , [users])
+        setFilteredUsers(users)
+        setFilteredUsers(prev => prev.filter(user => user?.name.toLowerCase().includes(searchTerm.toLowerCase())))
+    }, [users , sender ])
+
+    useEffect(() => {
+
+        const fetchUsers = async () => {
+
+            try {
+                if (sender) {
+                    const response = await axios.get(`${import.meta.env.VITE_API_URI}/users/get-users/sender/${sender}`, { withCredentials: true });
+
+                    const data = response?.data
+
+                    // console.log("data : ", data)
+
+                    if (data.success === true) {
+                        setUsers(data.users)
+                        setFilteredUsers(data.users)
+                    }
+                }
+            } catch (error) {
+                console.log("fetchUsers error : ", error)
+            }
+
+        }
+        fetchUsers();
+
+    }, [user , sender])
+
+    useEffect(() => {
+        console.log("users : ", user);
+        // console.log("filtered users: " , filteredUsers)
+
+    }, [users, user, filteredUsers])
 
     return (
         <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50">
@@ -82,9 +94,9 @@ function AddFriends() {
                                 <div className="p-4 flex flex-col items-center">
                                     {/* User Avatar */}
                                     <div className="relative mb-3">
-                                        {user.profilePic ? (
+                                        {user.avatar ? (
                                             <img
-                                                src={user.profilePic}
+                                                src={user.avatar}
                                                 alt={user.name}
                                                 className="w-16 h-16 rounded-full object-cover"
                                             />
