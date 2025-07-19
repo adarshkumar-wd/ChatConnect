@@ -3,11 +3,13 @@ import axios from 'axios';
 import UserCard from '../components/UserCard';
 import NavBar from '../components/NavBar';
 import { useSocket } from '../context/SocketContext';
+import { useNavigate } from 'react-router-dom';
 
 
 function Home() {
   const [users, setUsers] = useState([]);
   const socket = useSocket();
+  const navigate = useNavigate();
 
 
   
@@ -38,7 +40,9 @@ function Home() {
 
           {users.length === 0 && (
             <div className="text-center py-12">
-              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4" />
+              <div 
+              onClick={() => navigate("/add-friend")}
+              className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4 leading-3.5 flex items-center justify-center font-medium italic text-[9px] cursor-pointer active:bg-gray-300">Add Friend</div>
               <h3 className="text-xl font-semibold text-gray-700">No friends yet</h3>
               <p className="text-gray-500 mt-2">
                 Start adding friends to see them here

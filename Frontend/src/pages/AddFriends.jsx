@@ -108,7 +108,7 @@ function AddFriends() {
                                             </div>
                                         )}
                                         {/* Add Button */}
-                                        <button className="absolute -bottom-1 -right-1 bg-purple-600 text-white p-1.5 rounded-full hover:bg-purple-700 transition-colors">
+                                        <button className="cursor-pointer absolute -bottom-1 -right-1 bg-purple-600 text-white p-1.5 rounded-full hover:bg-purple-700 transition-colors">
                                             <FaPlus className="text-xs" />
                                         </button>
                                     </div>
